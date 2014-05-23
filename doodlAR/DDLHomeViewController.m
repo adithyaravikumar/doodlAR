@@ -255,7 +255,7 @@ NSUInteger const TBNBlueBrushColor = 0x3353a3;
 	[self.locationManager startUpdatingLocation];
 }
 
--(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
 	CLLocation *lastLocation = [locations lastObject];
 	CLLocationAccuracy accuracy = [lastLocation horizontalAccuracy];
     
@@ -269,9 +269,14 @@ NSUInteger const TBNBlueBrushColor = 0x3353a3;
 	if(accuracy < 100.0) {
 		[manager stopUpdatingLocation];
         self.firstLoad = NO;
-        DDLFlipsideViewController *arsFlipsideViewController = [[DDLFlipsideViewController alloc] initWithLocation:lastLocation andDisplayView:self.arsPaintingview];
-        [self.navigationController pushViewController:arsFlipsideViewController animated:YES];
+        [self navigateToFlipsideControllerWithLocation:lastLocation];
 	}
+}
+
+- (void)navigateToFlipsideControllerWithLocation:(CLLocation *)location
+{
+    DDLFlipsideViewController *arsFlipsideViewController = [[DDLFlipsideViewController alloc] initWithLocation:location andDisplayView:self.arsPaintingview];
+    [self.navigationController pushViewController:arsFlipsideViewController animated:YES];
 }
 
 @end

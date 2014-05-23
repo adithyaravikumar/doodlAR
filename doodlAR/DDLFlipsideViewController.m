@@ -55,14 +55,15 @@ const int kInfoViewTag = 1001;
 #pragma mark - Actions
 
 - (NSMutableArray *)generateGeoLocations {
-	
-	ARGeoCoordinate *coordinate = [ARGeoCoordinate coordinateWithLocation:self.userLocation locationTitle:@"CurrentLocation"];
+    CLLocation *tempLocation = [[CLLocation alloc] initWithLatitude:39.550051 longitude:-105.782067];
+    
+    ARGeoCoordinate *coordinate = [ARGeoCoordinate coordinateWithLocation:tempLocation locationTitle:@"Location"];
     [coordinate calibrateUsingOrigin:self.userLocation];
     DDLMarkerView *markerView = [[DDLMarkerView alloc] initWithCoordinate:coordinate withDisplayView:self.displayView andDelegate:self];
     NSLog(@"Marker view %@", markerView);
     
     [coordinate setDisplayView:markerView];
-    [_arController addCoordinate:coordinate];
+    [self.arController addCoordinate:coordinate];
     
     NSMutableArray *geoLocations = [[NSMutableArray alloc] init];
     [geoLocations addObject:coordinate];

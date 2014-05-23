@@ -13,5 +13,5 @@
 - (void)setBrushColorWithRed:(CGFloat)red green:(CGFloat)green blue:(CGFloat)blue;
 - (void)setBrushTextureWithTextureName:(NSString *)textureName;
 - (void)renderLineFromPoint:(CGPoint)start toPoint:(CGPoint)end;
-
+- (UIImage *) snapshot;
 @end

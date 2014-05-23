@@ -201,10 +201,9 @@ typedef struct {
             glUniform1f(program[PROGRAM_POINT].uniform[UNIFORM_POINT_SIZE], brushTexture.width / kBrushScale);
             
             // initialize brush color
-            glUniform4fv(program[PROGRAM_POINT].uniform[UNIFORM_VERTEX_COLOR], 1, brushColor);
+            glUniform4fv(program[PROGRAM_POINT].uniform[UNIFORM_VERTEX_COLOR], 1, (GLfloat *)brushColor);
         }
 	}
-    
     glError();
 }
 
@@ -488,7 +487,7 @@ typedef struct {
     
     if (initialized) {
         glUseProgram(program[PROGRAM_POINT].id);
-        glUniform4fv(program[PROGRAM_POINT].uniform[UNIFORM_VERTEX_COLOR], 1, (float *)brushColor);
+        glUniform4fv(program[PROGRAM_POINT].uniform[UNIFORM_VERTEX_COLOR], 1, (GLfloat *)brushColor);
     }
 }
 
@@ -496,6 +495,38 @@ typedef struct {
 {
     brushTextureName = textureName;
     [self textureFromName:brushTextureName];
+}
+
+-(UIImage *) snapshot {
+    NSInteger myDataLength = backingWidth * backingHeight * 4;
+    // allocate array and read pixels into it.
+    GLubyte *buffer = (GLubyte *) malloc(myDataLength);
+    glReadPixels(0, 0, backingWidth, backingHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    // gl renders "upside down" so swap top to bottom into new array.
+    // there's gotta be a better way, but this works.
+    GLubyte *buffer2 = (GLubyte *) malloc(myDataLength);
+    for(int y = 0; y <backingHeight; y++)
+    {
+        for(int x = 0; x <backingWidth * 4; x++)
+        {
+            buffer2[((backingHeight - 1) - y) * backingWidth * 4 + x] = buffer[y * 4 * backingWidth + x];
+        }
+    }
+    free(buffer);
+    // make data provider with data.
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, buffer2, myDataLength, NULL);
+    // prep the ingredients
+    int bitsPerComponent = 8;
+    int bitsPerPixel = 32;
+    int bytesPerRow = 4 * backingWidth;
+    CGColorSpaceRef colorSpaceRef = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = kCGBitmapByteOrderDefault;
+    CGColorRenderingIntent renderingIntent = kCGRenderingIntentDefault;
+    // make the cgimage
+    CGImageRef imageRef = CGImageCreate(backingWidth, backingHeight, bitsPerComponent, bitsPerPixel, bytesPerRow, colorSpaceRef, bitmapInfo, provider, NULL, NO, renderingIntent);
+    // then make the uiimage from that
+    UIImage *myImage = [UIImage imageWithCGImage:imageRef];
+    return myImage;
 }
 
 @end

@@ -246,8 +246,8 @@ typedef struct {
         free(brushData);
         
         texture.id = texId;
-        texture.width = width;
-        texture.height = height;
+        texture.width = (GLsizei)width;
+        texture.height = (GLsizei)height;
     }
     
     return texture;
